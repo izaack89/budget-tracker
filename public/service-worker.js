@@ -3,21 +3,39 @@ const DATA_CACHE_NAME = "budget-data-cache-v1";
 
 const FILES_TO_CACHE = [
     "/",
-    "/db.js",
     "/index.js",
     "/manifest.json",
-    "/style.css",
+    "/styles.css",
     "/icons/icon-192x192.png",
     "/icons/icon-512x512.png",
 ];
 
-self.addEventListener("install",function(evt){
-    evt.waitUntil(
-        caches.open(CACHE_NAME).then(cache => {
-            console.log("Cache");
-            return cache.addAll(FILES_TO_CACHE);
+self.addEventListener("install",function(evt) {
+  evt.waitUntil(
+    caches.open(CACHE_NAME)
+    .then((cache) => cache.addAll(FILES_TO_CACHE))
+    .then(self.skipWaiting())
+  );
+});
+
+// activate
+self.addEventListener("activate", function(evt) {
+
+  const currentCaches = [CACHE_NAME, DATA_CACHE_NAME];
+  evt.waitUntil(
+    caches.keys().then(keyList => {
+      return Promise.all(
+        keyList.map(key => {
+          if (key !== CACHE_NAME && key !== DATA_CACHE_NAME) {
+            console.log("Removing old cache data", key);
+            return caches.delete(key);
+          }
         })
-    );
+      );
+    })
+  );
+
+  self.clients.claim();
 });
 
 // fetch
@@ -43,16 +61,22 @@ self.addEventListener("fetch", function(evt) {
   
       return;
     }
-  
     evt.respondWith(
-      fetch(evt.request).catch(function(){
-        return caches.match(evt.request).then(response =>{
-            if(response){
-                return response;
-            }else if(evt.request.headers.get("accept").includes("text/html")){
-                return caches.match("/");
-            }
+      caches.open(CACHE_NAME).then(cache => {
+        return cache.match(evt.request).then(response => {
+          return response || fetch(evt.request);
         });
       })
     );
+    // evt.respondWith(
+    //   fetch(evt.request).catch(function(){
+    //     return caches.match(evt.request).then(function(response){
+    //         if(response){
+    //             return response;
+    //         }else if(evt.request.headers.get("accept").includes("text/html")){
+    //             return caches.match("/");
+    //         }
+    //     });
+    //   })
+    // );
   });
