@@ -10,3 +10,12 @@ let urlToCache = [
     "/icons/icon-192x192.png",
     "/icons/icon-512x512.png",
 ];
+
+self.addEventListener("install",function(evt){
+    evt.waitUntil(
+        caches.open(CACHE_NAME).then(function(cache){
+            console.log("Cache");
+            return cache.addAll(urlToCache);
+        })
+    );
+});
