@@ -47,4 +47,4 @@ If you have any questions about the repository, open an issue or contact me dire
 
 - **German Ramirez** - [GitHub](https://github.com/izaack89/)
 
-![Badge for GitHub](https://img.shields.io/github/languages/top/izaack89/Budget-Tracker?style=plastic&logo=github)
+![Badge for GitHub](https://img.shields.io/github/languages/top/izaack89/budget-tracker?style=plastic&logo=github)
